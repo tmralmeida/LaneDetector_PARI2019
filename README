@@ -1,0 +1,21 @@
+Para colocar a funcionar:
+	Por exemplo: abrir um terminal e colocar server 50000 e abrir outro terminal e colocar client. Ou então com dois computadores mas aí é preciso ligar-se ao IP correspondente!!
+	
+Para fechar o server 50000: ctrl+C;
+----------------------------------------------------------------------------------------------------------------------------------------------------
+NOTA IMPORTANTE:
+
+Este código está preparado para 10 imagens, mas está automatizado para receber mais. Basta pôr na pasta "src" as imagens que quiser do mesmo estilo  das que lá estão, ou seja, "IMG1.jpg", sendo "1" o número da imagem. 
+Por exemplo:
+	-Se quiser pôr mais duas imagens teria que dar-lhes o nome de IMG11.jpg e IMG12.jpg;
+
+Para além disto, é preciso alterar duas variáveis:
+	- number_totimages no ficheiro-server.cpp, função- processclient;
+	-num_images no ficheiro client.cpp o cliente também conta as imagens para dar os valores dos processamentos promovidos pela aplicação que correspondem corretamente ao número da imagem.
+
+Então, seguindo, o exemplo anterior:
+	-number_totimages=12;
+	-num_images=12;
+
+
+Enjoy!

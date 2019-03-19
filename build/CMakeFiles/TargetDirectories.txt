@@ -1,0 +1,15 @@
+/home/tiago/PARI/Projeto_77107/build/CMakeFiles/list_install_components.dir
+/home/tiago/PARI/Projeto_77107/build/CMakeFiles/rebuild_cache.dir
+/home/tiago/PARI/Projeto_77107/build/CMakeFiles/edit_cache.dir
+/home/tiago/PARI/Projeto_77107/build/CMakeFiles/install/strip.dir
+/home/tiago/PARI/Projeto_77107/build/CMakeFiles/doc.dir
+/home/tiago/PARI/Projeto_77107/build/CMakeFiles/libpath.dir
+/home/tiago/PARI/Projeto_77107/build/CMakeFiles/prototypes.h.dir
+/home/tiago/PARI/Projeto_77107/build/CMakeFiles/install.dir
+/home/tiago/PARI/Projeto_77107/build/CMakeFiles/myutils.dir
+/home/tiago/PARI/Projeto_77107/build/CMakeFiles/install/local.dir
+/home/tiago/PARI/Projeto_77107/build/CMakeFiles/client.dir
+/home/tiago/PARI/Projeto_77107/build/CMakeFiles/cpfiles.dir
+/home/tiago/PARI/Projeto_77107/build/CMakeFiles/server.dir
+/home/tiago/PARI/Projeto_77107/build/CMakeFiles/servproto.dir
+/home/tiago/PARI/Projeto_77107/build/CMakeFiles/clientproto.dir

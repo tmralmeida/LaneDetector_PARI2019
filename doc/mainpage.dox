@@ -1,0 +1,138 @@
+/** @mainpage ImagProc- O processador de imagens 
+ *
+ * @section intro_sec Descrição Geral
+ *
+ * Este projeto consta da Unidade Curricular de PARI (Projecto em Automação e Robótica Industrial) 
+ * e consiste no desenvolvimento de uma interface que comunica com um sistema remoto usando suportes 
+ * padrão de comunições- que, neste caso, consiste numa comunicação por TCP/IP.
+ * Neste projeto concebeu-se um servidor que envia imagens para o respetivo cliente, através de uma 
+ * ligação por TCP/IP. Porém, é preciso esclarecer que a base do trabalho assenta mum fork inicial 
+ * que dá origem a um "processo pai" e a um "processo filho", em que o filho se encarrega da interface
+ * e o pai das comunicacões, existindo entre eles, um ponto comum- a shared memory. Esta possibilita a
+ * troca de informações entre o pai e o filho. 
+ * O projeto enquadra-se na Tese de Mestrado do autor, uma vez que, esta se relaciona com
+ * a deteção das linhas da estrada a bordo do Atlascar. Por conseguinte, a base de imagens utilizada  
+ * contempla estradas a bordo de veículos. Posto isto, a principal função desta aplicação é detetar as 
+ * linhas da estrada.
+
+ * @author  Tiago Almeida, número mecanográfico:77107
+ * @section sist_sec  Sistema remoto com o qual se interagiu
+
+Como foi explicado anteriormente, o "processo pai" encarregou-se das comunicações, então foi neste que 
+se desenvolveu o servidor, tendo  coomo ponto fulcral o envio de imagens assim que o filho 
+partilhar na shared memory o pedido e o pai for lê-lo. A parte do código intressante do ponto de vista 
+demonstrativo, no que toca ao envio das imagens é a seguinte:  
+\code {.sh}
+
+frame = imread(nameofimage, CV_LOAD_IMAGE_COLOR);
+if (!frame.data) // Check for invalid input
+{
+        cout << "Could not open or find the image" << std::endl;
+}
+frame = (frame.reshape(0, 1)); // to make it continuous
+imgSize = frame.total() * frame.elemSize();
+
+while (bytesTransferred < imgSize)
+{
+        bytes = send(sock, frame.data, imgSize, 0);
+	if (bytes < 0)
+	{
+		perror("send_size()");
+		exit(errno);
+	}
+	bytesTransferred += bytes;
+	if (bytesTransferred != 0)
+	{
+		printf("\nNumero de bytes enviados do servidor:%d\n", bytesTransferred);
+	}
+}
+frame.release();
+
+\endcode
+
+Aqui dá-se conta do envio dos da imagem por pacotes enquanto o número de dados transferidos (bytesTransferred) não for 
+igual ao tamanho dos dados que se tem que enviar(imgSize). Dá-se ainda conta, do facto de, ter que se efetuar um envio preliminar
+de um cabeçalho que contém o tamanho da imagem (número de linhas e colunas em pixels de cada canal) o que será crucial aquando da 
+sua conceção do lado do processo filho, sendo estes dados todos postos na memória partilhada pelo processo pai, depois de recebidos.
+Depois da imagem estar construída do lado do processo filho dar-se-á a possibilidade ao utilizador de a processar, 
+através de vários tipos de processamento.
+
+ * @section desc_sec  Descrição do protocolo/ambiente/forma de comunicação a usar
+
+O protocolo de comunicação utilizado foi o TCP/IP, que tem como relevantes caraterísticas a definição da porta
+através da qual o cliente e o servidor vão comunicar e ainda o IP, ou seja, o endereço que faz com que os 
+pacotes de dados sejam entregues ao respetivo destinatário. 
+Para além disto, é interessante referir que posteriormente do lado do cliente se criou um sistema de 
+processamento das respetivas imagens provenientes do servidor, através da biblioteca OpenCV. 
+
+ * @section troc_sec  Shared memory
+
+ A shared memory possibilitou a troca de informações entre o pai e o filho. As informações trocadas nesta
+ shared memory foram: as imagens, os pedidos do lado da interface, como por exemplo, conectar ao servidor,
+ o pedido da imagem anterior e o pedido da imagem seguinte, ainda o pedido de fecho da sessão e, por último,
+ o cabeçalho correspondente a cada imagem e a respetiva informação de cada pixel da imagem (campo "data" da estrutura
+ da imagem em formato Mat do OpenCV).
+
+  * @section pocim_sec  Processamento das imagens
+
+Quando a imagem estivesse posta na shared memory então seria necessário a sua contrução, nesta fase destaca-se
+o segunte código:
+
+\code {.sh}
+for (ii = 0; ii < img.rows; ii++)
+{
+        for (j = 0; j < img.cols; j++)
+        {
+            img.at<cv::Vec3b>(ii, j) = cv::Vec3b(data->data_pai_imgdata[ptr + 0], data->data_pai_imgdata[ptr + 1], data->data_pai_imgdata[ptr + 2]);
+            ptr = ptr + 3;
+        }
+#code inspired on: https://stackoverflow.com/questions/20314524/c-opencv-image-sending-through-socket.
+}
+\endcode
+
+Ciclo que potencia a colocação da informação dos pixeis ao longo de uma imagem criada anteriormente.
+Depois disto, promoveu-se na interface o processamento das imagens através do clássico Threshold, a aplicação do 
+filtro de Canny, o manuseamento dos canais de cor HSV (espaço de cor mais interessante do ponto de vista do processamento)
+e ainda a rotação da imagem. Ainda nesta fase, permitiu-se que o utilizador possa escolher os valores recomendados 
+pela aplicação de forma a obter uma melhor binarização da imagem e deteção de edges, com vista à deteção das linhas da estrada.
+
+
+
+* @section inter_sec  Interface Gráfica
+
+A interface gráfica foi realizada em GTK, sendo a sua disposição inicial a apresentada na figura seguinte:
+<img src="../../doc/inti_inicial.png" height="400" width="700" title="Disposição Inicial da Interface Gráfica.">
+
+Pssando depois pelo seguinte estágio:
+<img src="../../doc/est_int.png" height="400" width="700" title="Estágio Intermédio da Interface.">
+
+Por último, dando oportunidade ao utilizador de processar a imagem, a título de exemplo, da seguinte forma:
+<img src="../../doc/est_final.png" height="400" width="700" title="Estado Final da Interface Gráfica.">
+
+
+
+
+* @section fases_sec  Fases do Projecto
+
+O procedimento adotado para a conceção do projeto foi o seguinte:
+\verbatim
+        1-Estabelecer a comunicação entre cliente e servidor através de TCP/IP
+        2-Criação da Shared Memory com todos os campos necessários à troca de mensagens entre o processo-pai e o processo-filho
+        3-Criação da Interface GTK
+        4-Proceder ao envio e receção de imagens e mensagens entre cliente e servidor
+        5-Programar o processamento de imagem permitido ao utilizador
+\endverbatim
+
+Considerando como guia ou ponto de partida a seguinte arquitectura proposta pelo docente:
+<img src="../../doc/esquema.png" height="300" width="300" title="Esquema lógico da conceção do projeto.">
+
+* @section con_sec  Conclusão
+
+Este projecto permitiu a consolidação de matérias abordadas na Unidade Curricular de grande importância, dá-se 
+o exemplo da Memória Partilhada e das comunicações através de TCP/IP. Ainda, permite ao aluno familiarizar-se com os 
+assuntos que consistirão da sua Tese de Mestrado, como por exemplo, a parte referente ao processamento da imagem e deteção
+das linhas da estrada. Por último, pode-se inferir que os objetivos propostos no inicio do trabalho foram todos 
+cumpridos com sucesso e que ainda se conseguiu fazer um "add-on" ao trabalho- os valores propostos para cada tipo
+de processamento de imagem.
+
+*/

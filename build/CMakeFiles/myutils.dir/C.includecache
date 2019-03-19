@@ -1,0 +1,20 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/tiago/PARI/Projeto_77107/srcmyutils/myutils.h
+prototypes.h
+/home/tiago/PARI/Projeto_77107/srcmyutils/prototypes.h
+
+/home/tiago/PARI/Projeto_77107/srcmyutils/pcolor.c
+stdio.h
+-
+myutils.h
+/home/tiago/PARI/Projeto_77107/srcmyutils/myutils.h
+
+/home/tiago/PARI/Projeto_77107/srcmyutils/prototypes.h
+
